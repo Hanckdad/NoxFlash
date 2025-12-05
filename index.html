@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatsune Flash - AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="public/css/style.css">
+</head>
+<body>
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner dark"></div>
+            <div class="mt-4 text-primary font-medium">Loading Hatsune Flash...</div>
+        </div>
+    </div>
+    
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="uploadModalTitle">Upload File</h3>
+                <button class="close-panel" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload-container" id="fileUploadContainer">
+                    <label class="upload-label" for="fileInput">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <span class="upload-text">Drop files here or click to upload</span>
+                        <span class="upload-subtext">Supports: Images, PDF, DOC, TXT, etc.</span>
+                    </label>
+                    <input type="file" id="fileInput" class="upload-input" accept="image/*,.pdf,.doc,.docx,.txt,.md">
+                    
+                    <div class="upload-preview" id="uploadPreview">
+                        <!-- Preview items will be added here -->
+                    </div>
+                    
+                    <div class="mt-4">
+                        <textarea id="uploadCaption" placeholder="Optional: Add a caption or question about this file..." rows="2" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); resize: vertical;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="tool-btn" id="cancelUpload">Cancel</button>
+                <button class="tool-btn" id="processUpload" style="background: linear-gradient(135deg, var(--primary), #0066ff); color: white;">
+                    <i class="fas fa-magic"></i>
+                    Analyze File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Tools Panel -->
+    <div class="tools-panel" id="toolsPanel">
+        <div class="tools-header">
+            <h3 class="tools-title">
+                <i class="fas fa-tools"></i>
+                AI Tools
+            </h3>
+            <button class="close-panel" id="closePanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="tools-tabs">
+            <button class="tab-btn active" data-tab="tiktok">
+                <i class="fab fa-tiktok"></i>
+                TikTok
+            </button>
+            <button class="tab-btn" data-tab="instagram">
+                <i class="fab fa-instagram"></i>
+                Instagram
+            </button>
+            <button class="tab-btn" data-tab="youtube">
+                <i class="fab fa-youtube"></i>
+                YouTube
+            </button>
+            <button class="tab-btn" data-tab="ai-tools">
+                <i class="fas fa-robot"></i>
+                AI Tools
+            </button>
+        </div>
+        
+        <div class="status-message" id="statusMessage"></div>
+        
+        <!-- TikTok Tab -->
+        <div class="tools-content active" id="tiktokTab">
+            <div class="tools-input-group">
+                <input 
+                    type="url" 
+                    id="tiktokUrl" 
+                    class="tools-input" 
+                    placeholder="Paste TikTok URL here..."
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            
+            <button class="download-btn tiktok" id="downloadTikTokBtn">
+                <i class="fas fa-download"></i>
+                Download Without Watermark
+            </button>
+            
+            <div class="preview-section" id="tiktokPreviewSection">
+                <div class="video-info">
+                    <h4 class="video-title" id="tiktokVideoTitle">TikTok Video</h4>
+                    <div class="video-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span id="tiktokVideoAuthor">@username</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="tiktokVideoDuration">0:00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tools-options" id="tiktokDownloadOptions"></div>
+            </div>
+        </div>
+        
+        <!-- Instagram Tab -->
+        <div class="tools-content" id="instagramTab">
+            <div class="tools-input-group">
+                <input 
+                    type="url" 
+                    id="instagramUrl" 
+                    class="tools-input" 
+                    placeholder="Paste Instagram URL here..."
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            
+            <button class="download-btn instagram" id="downloadInstagramBtn">
+                <i class="fas fa-download"></i>
+                Download Instagram Content
+            </button>
+            
+            <div class="preview-section" id="instagramPreviewSection">
+                <div class="video-info">
+                    <h4 class="video-title" id="instagramVideoTitle">Instagram Content</h4>
+                    <div class="video-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span id="instagramAuthor">@username</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-file"></i>
+                            <span id="instagramType">Type: Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tools-options" id="instagramDownloadOptions"></div>
+            </div>
+        </div>
+        
+        <!-- YouTube Tab -->
+        <div class="tools-content" id="youtubeTab">
+            <div class="tools-input-group">
+                <input 
+                    type="url" 
+                    id="youtubeUrl" 
+                    class="tools-input" 
+                    placeholder="Paste YouTube URL here..."
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            
+            <div class="tools-options">
+                <div class="tool-option">
+                    <div class="option-header">
+                        <i class="fab fa-youtube option-icon youtube"></i>
+                        <div class="option-title">Video (MP4)</div>
+                    </div>
+                    <p class="option-desc">Download video in MP4 format with various quality options</p>
+                    <button class="option-btn youtube" id="downloadYoutubeMp4Btn">
+                        <i class="fas fa-download"></i>
+                        Download MP4
+                    </button>
+                </div>
+                
+                <div class="tool-option">
+                    <div class="option-header">
+                        <i class="fas fa-music option-icon youtube"></i>
+                        <div class="option-title">Audio (MP3)</div>
+                    </div>
+                    <p class="option-desc">Extract audio only in MP3 format</p>
+                    <button class="option-btn youtube" id="downloadYoutubeMp3Btn">
+                        <i class="fas fa-download"></i>
+                        Download MP3
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-section" id="youtubePreviewSection">
+                <div class="video-info">
+                    <h4 class="video-title" id="youtubeVideoTitle">YouTube Video</h4>
+                    <div class="video-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span id="youtubeChannel">Channel</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="youtubeDuration">0:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI Tools Tab -->
+        <div class="tools-content" id="aiToolsTab">
+            <div class="ai-image-tools">
+                <div class="tools-input-group">
+                    <input 
+                        type="url" 
+                        id="aiImageUrl" 
+                        class="tools-input" 
+                        placeholder="Paste image URL here..."
+                        required
+                        autocomplete="off"
+                    >
+                </div>
+                
+                <div class="tool-option">
+                    <div class="option-header">
+                        <i class="fas fa-magic option-icon"></i>
+                        <div class="option-title">Face Editor</div>
+                    </div>
+                    <p class="option-desc">Edit faces with various AI filters</p>
+                    
+                    <div class="filter-options" id="faceFilters">
+                        <button class="filter-btn" data-filter="coklat">Coklat</button>
+                        <button class="filter-btn" data-filter="hitam">Hitam</button>
+                        <button class="filter-btn" data-filter="nerd">Nerd</button>
+                        <button class="filter-btn" data-filter="piggy">Piggy</button>
+                        <button class="filter-btn" data-filter="carbon">Carbon</button>
+                        <button class="filter-btn" data-filter="botak">Botak</button>
+                    </div>
+                    
+                    <button class="option-btn" id="applyFaceFilterBtn">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        Apply Filter
+                    </button>
+                </div>
+                
+                <div class="tool-option">
+                    <div class="option-header">
+                        <i class="fas fa-paint-brush option-icon"></i>
+                        <div class="option-title">Image to Anime</div>
+                    </div>
+                    <p class="option-desc">Convert any image to anime style</p>
+                    
+                    <div class="model-options" id="animeModels">
+                        <button class="model-btn active" data-model="anime">Anime</button>
+                        <button class="model-btn" data-model="loli">Loli</button>
+                    </div>
+                    
+                    <button class="option-btn" id="convertToAnimeBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        Convert to Anime
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-section" id="aiToolsPreviewSection">
+                <div class="tools-options" id="aiToolsResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <div>Hatsune Flash</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            Advanced AI Assistant
+                        </div>
+                    </div>
+                </div>
+                <button class="new-chat-btn" id="newChatBtn">
+                    <i class="fas fa-plus"></i>
+                    New Chat
+                </button>
+            </div>
+            
+            <div class="chat-history" id="chatHistory">
+                <!-- Chat history items will be added here -->
+            </div>
+            
+            <div class="sidebar-footer">
+                <div>Hatsune Flash</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="chat-title" id="chatTitle">New Conversation</div>
+                <div class="chat-tools">
+                    <button class="tool-btn new-chat-header" id="newChatBtnHeader" title="New Chat">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="tool-btn ai-tools" id="toolsBtn">
+                        <i class="fas fa-tools"></i>
+                        AI Tools
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                <!-- Messages will be added here -->
+            </div>
+            
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="userInput" 
+                        placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)" 
+                        rows="1"
+                        autocomplete="off"
+                        spellcheck="true"
+                    ></textarea>
+                    <div class="input-actions">
+                        <button class="upload-action-btn image" id="uploadImageBtn" title="Upload Image">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="upload-action-btn" id="uploadFileBtn" title="Upload Document">
+                            <i class="fas fa-file-upload"></i>
+                        </button>
+                        <button class="send-btn" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Sidebar Toggle -->
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Author Badge -->
+        <div class="author-badge">
+            <i class="fas fa-robot"></i> Hatsune Flash
+        </div>
+    </div>
+
+    <script src="public/js/app.js"></script>
+</body>
+</html>
